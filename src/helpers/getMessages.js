@@ -7,7 +7,7 @@ export const getMessages = () => {
     month: "Month",
     week: "Week",
     day: "Day",
-    agenda: "Agend",
+    agenda: "Agenda",
     date: "Date",
     time: "Hour",
     event: "Event",

@@ -1,25 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavBar } from "../components/NavBar";
 import { Calendar } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { addHours } from "date-fns";
 import { localizer, getMessages } from "../../helpers";
-
-const events = [
-  {
-    title: "Meeting",
-    notes: "Buy gift",
-    start: new Date(),
-    end: addHours(new Date(), 2),
-    bgColor: "#fafafa",
-    user: {
-      _id: "123",
-      name: "fernan",
-    },
-  },
-];
+import { CalendarEvent } from "../components/CalendarEvent";
+import { CalendarModal } from "../components/CalendarModal";
+import { useUiStore, useCalendarStore } from "../../hooks";
+import { FabAddNew } from "../components/FabAddNew";
 
 export const CalendarPage = () => {
+  const [lastView, setLastView] = useState(
+    localStorage.getItem("lastView") || "week"
+  );
+
+  const { openModal } = useUiStore();
+  const { events, activateEvent } = useCalendarStore();
   const eventPropGetter = (event, start, end, isSelected) => {
     const style = {
       backgroundColor: "#347CF7",
@@ -28,22 +23,29 @@ export const CalendarPage = () => {
       color: "white",
     };
 
-    console.log({
-      event,
-      start,
-      end,
-      isSelected,
-    });
-
     return {
       style,
     };
   };
 
+  const onDoubleClick = () => {
+    openModal();
+  };
+
+  const onSelect = (event) => {
+    activateEvent(event);
+  };
+
+  const onViewChanged = (event) => {
+    localStorage.setItem("lastView", event);
+  };
+
   return (
     <>
       <NavBar />
+      <CalendarModal />
       <Calendar
+        defaultView={lastView}
         culture="en"
         messages={getMessages()}
         localizer={localizer}
@@ -52,7 +54,14 @@ export const CalendarPage = () => {
         endAccessor="end"
         style={{ height: "calc(100vh - 80px)" }}
         eventPropGetter={eventPropGetter}
+        components={{
+          event: CalendarEvent,
+        }}
+        onDoubleClickEvent={onDoubleClick}
+        onSelectEvent={onSelect}
+        onView={onViewChanged}
       />
+      <FabAddNew />
     </>
   );
 };
